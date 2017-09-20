@@ -77,6 +77,9 @@ public class ProcessFilesSequential {
         long endTimeScores = System.currentTimeMillis();
 
         System.out.println("Computed word and neighbor scores in " + (endTimeScores - startTimeScores) + "ms");
+
+        writeSortedFinalWordScores();
+        printLetterStats(letterScore);
     }
 
     public void processWords(List<String> words) {
@@ -192,6 +195,46 @@ public class ProcessFilesSequential {
 
             wordKNeighborhoodMeanScore.put(word, kNeighborhoodMean);
         }
+    }
+
+    // Sorting code derived from comments in:
+    //   https://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-values-java
+    public void writeSortedFinalWordScores() throws IOException {
+        TreeMap<String, Float> sorted = new TreeMap<String, Float>(wordKNeighborhoodMeanScore);
+        Set<Map.Entry<String, Float>> mappings = sorted.entrySet();
+
+        BufferedWriter bw = new BufferedWriter(new FileWriter("output.csv"));
+
+        System.out.println("Saving neighborhood scores after sorting by keys to output.csv");
+        for(Map.Entry<String, Float> mapping : mappings){
+            bw.write(mapping.getKey() + "," + mapping.getValue() + "\n");
+        }
+
+        bw.close();
+    }
+
+    public void printLetterStats(Integer[] letterScore) {
+        System.out.println("Total number of characters: " + totalCharacters);
+        String header = "";
+        String occurances = "";
+        String percentage = "";
+        String score = "";
+        Float percentageTotal = 0.0F;
+        for (int i = 0; i < NUM_EXPECTED_CHARS; i++) {
+            header += "\t" + (char) (i + ASCII_START_INDEX_LETTERS);
+            occurances += "\t" + characterOccurances[i];
+            Float percentageOccurance = (float)characterOccurances[i]/(float)totalCharacters * 100.0F;
+            Integer percentageOccuranceRounded = Math.round(percentageOccurance);
+            percentage += "\t" + percentageOccuranceRounded;
+            percentageTotal += percentageOccurance;
+            score += "\t" + letterScore[i];
+        }
+
+        System.out.println("Percentage Total: " + percentageTotal);
+        System.out.println(header);
+        System.out.println(occurances);
+        System.out.println(percentage);
+        System.out.println(score);
     }
 
 }
