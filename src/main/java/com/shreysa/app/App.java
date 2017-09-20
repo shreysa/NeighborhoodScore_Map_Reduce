@@ -1,8 +1,11 @@
+/** PDPMR 5240 Fall 2017 
+Assignment A0A1 
+Author : Shreysa Sharma 
+*/
+
 package com.shreysa.app;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,13 +46,32 @@ public class App
         return fileLines;
     }
 
-    public static void main( String[] args )
+    /**
+     * This method gets all the files from the folder path with extension .txt
+     * @param folderPath folder path from which files need to be processed
+     * @return Returns Array of files, each entry corresponds to a file
+     */
+    public static File[] getFilesInDirectory(String folderPath) {
+        File dir = new File(folderPath);
+        File [] files = dir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".txt");
+            }
+        });
+        return files;
+    }
+    
+    public static void main( String[] args ) throws IOException
     {
-        final String TEST_FILE = "./data/lorem.txt";
-        List<String> fileContents = readFile(TEST_FILE);
+         ProgramArgs options = new ProgramArgs(args);
 
-        for (String line: fileContents) {
-            System.out.println(line);
+        File[] files = getFilesInDirectory("./data/books");
+
+        if (options.getNumThreads() == 1) {
+            ProcessFilesSequential pr = new ProcessFilesSequential(options);
+            pr.processFiles(files);
+        } else {
         }
     }
 }
