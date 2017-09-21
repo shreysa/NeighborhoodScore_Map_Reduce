@@ -1,4 +1,10 @@
-package com.shreysa.app;
+/**
+ * PDPMR 6240 Fall 2017
+ * Assignment A0A1
+ * Author : Shreysa Sharma
+ */
+
+package src.main;
 
 import java.io.*;
 import java.util.*;

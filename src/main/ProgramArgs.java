@@ -1,9 +1,10 @@
-/** PDPMR 5240 Fall 2017 
-Assignment A0A1 
-Author : Shreysa Sharma 
-*/
+/**
+ * PDPMR 6240 Fall 2017
+ * Assignment A0A1
+ * Author : Shreysa Sharma
+ */
 
-package com.shreysa.app;
+package src.main;
 
 
 public class ProgramArgs {
