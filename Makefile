@@ -41,7 +41,6 @@ gunzip:
 	gunzip -q ./input/*
 
 build:  App.class                    \
-       	ProcessFilesSequential.class \
        	ProgramArgs.class            \
        	ProcessFilesTask.class       \
        	ProcessFiles.class           \
@@ -57,9 +56,6 @@ parallel:
 
 App.class:  src/main/App.java
 	$(JCC) $(JFLAGS) ./src/main/App.java
-
-ProcessFilesSequential.class:   src/main/ProcessFilesSequential.java
-	$(JCC) $(JFLAGS) ./src/main/ProcessFilesSequential.java
 
 ProgramArgs.class: src/main/ProgramArgs.java
 	$(JCC) $(JFLAGS) ./src/main/ProgramArgs.java

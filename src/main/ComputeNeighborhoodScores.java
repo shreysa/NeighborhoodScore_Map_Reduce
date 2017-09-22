@@ -13,7 +13,7 @@ import java.util.*;
 
 /**
  * Computes the letter scores, neighborhood scores, accumulates these scores,
- * kNeighborhood scores and kneighborhoodMean scores and sends it to an output_threaded.csv
+ * kNeighborhood scores and kneighborhoodMean scores and sends it to an output csv
  * file
  */
 
@@ -180,6 +180,7 @@ public class ComputeNeighborhoodScores {
 
 
     /* Debug methods
+     *
      */
 
     public void printLetterStats(Integer[] letterScore) {
@@ -204,6 +205,35 @@ public class ComputeNeighborhoodScores {
          System.out.println(occurances);
          System.out.println(percentage);
          System.out.println(score);
+    }
+
+    public void printKNeighbors() {
+        for (Map.Entry<String, List<List<String>>> entry : kNeighborhoods.entrySet()) {
+            String word = entry.getKey();
+            List<List<String>> value = entry.getValue();
+
+            String neighborString = "";
+            for (List<String> kNeighbors: value) {
+                neighborString += "[";
+                for (int i = 0; i < kNeighbors.size(); i++) {
+                    neighborString += kNeighbors.get(i);
+                    if (i < (kNeighbors.size() - 1))
+                        neighborString += ", ";
+                }
+                neighborString += "], ";
+            }
+
+            System.out.println(word + " ↦ " + neighborString);
+        }
+    }
+
+    public void printSortedFinalWordScores() {
+        TreeMap<String, Float> sorted = new TreeMap<String, Float>(wordKNeighborhoodMeanScore);
+        Set<Map.Entry<String, Float>> mappings = sorted.entrySet();
+
+        for(Map.Entry<String, Float> mapping : mappings){
+            System.out.println(mapping.getKey() + ": " + mapping.getValue());
+        }
     }
 
 }

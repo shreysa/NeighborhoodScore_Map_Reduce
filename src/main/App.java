@@ -81,10 +81,11 @@ public class App {
         final boolean NO_LOAD_BALANCE = true;
         ProgramArgs options = new ProgramArgs(args);
         File[] files = getFilesInDirectory(options.getFilePath());
-
+        long startTimeFiles;
+        List<ProcessFilesTask> tasks = new ArrayList<ProcessFilesTask>();
         //Sequential version
         if (options.getNumThreads() == 1) {
-            long startTimeFiles = System.currentTimeMillis();
+            startTimeFiles = System.currentTimeMillis();
             ProcessFiles pr = new ProcessFiles(files, options.getkValue());
             pr.processFiles();
             long endTimeFiles = System.currentTimeMillis();
@@ -105,9 +106,8 @@ public class App {
             //Without any load balance
             if (NO_LOAD_BALANCE) {
                 ExecutorService executor = Executors.newFixedThreadPool(options.getNumThreads());
-                List<ProcessFilesTask> tasks = new ArrayList<ProcessFilesTask>();
                 int segment = (files.length) / options.getNumThreads();
-                long startTimeFiles = System.currentTimeMillis();
+                startTimeFiles = System.currentTimeMillis();
 
                 //Assigns files to threads
                 for (int i = 0; i < options.getNumThreads(); i++) {
@@ -133,23 +133,7 @@ public class App {
                 } catch (InterruptedException ex) {
                     System.err.println("ERROR: " + ex.getMessage());
                 }
-
-                long endTimeFiles = System.currentTimeMillis();
-                System.out.println("Processed all files in " + (endTimeFiles - startTimeFiles) + " ms");
-
-                ComputeNeighborhoodScores scores = new ComputeNeighborhoodScores("output_threaded.csv");
-                for (ProcessFilesTask task : tasks) {
-                    scores.AddResults(task.processor.getCharacterOccurances(), task.processor.getkNeighborhoods());
-                }
-
-                long endTimeFilesAccumulate = System.currentTimeMillis();
-                System.out.println("Accumulated results from files in " + (endTimeFilesAccumulate - endTimeFiles) + " ms");
-
-                scores.calculateKNeighbourhoodScores();
-
-                long endTimeFilesCompute = System.currentTimeMillis();
-                System.out.println("Computed all files in " + (endTimeFilesCompute - endTimeFilesAccumulate) + " ms");
-            } else {
+                } else {
                 // With load balance : takes the size of files and then distributes the work
                 // amongst threads
                 long totalLoad = 0;
@@ -158,10 +142,9 @@ public class App {
                 }
 
                 ExecutorService executor = Executors.newFixedThreadPool(options.getNumThreads());
-                List<ProcessFilesTask> tasks = new ArrayList<ProcessFilesTask>();
 
                 long workPerThread = (totalLoad) / options.getNumThreads();
-                long startTimeFiles = System.currentTimeMillis();
+                startTimeFiles = System.currentTimeMillis();
                 int currentFile = 0;
                 for (int i = 0; i < options.getNumThreads(); i++) {
                     int startIndex = currentFile;
@@ -189,21 +172,21 @@ public class App {
                     System.err.println("ERROR: " + ex.getMessage());
                 }
 
-                long endTimeFiles = System.currentTimeMillis();
-                System.out.println("Processed all files in " + (endTimeFiles - startTimeFiles) + " ms");
-
-                ComputeNeighborhoodScores scores = new ComputeNeighborhoodScores("output_threaded.csv");
-                for (ProcessFilesTask task : tasks) {
-                    scores.AddResults(task.processor.getCharacterOccurances(), task.processor.getkNeighborhoods());
                 }
+            long endTimeFiles = System.currentTimeMillis();
+            System.out.println("Processed all files in " + (endTimeFiles - startTimeFiles) + " ms");
 
-                long endTimeFilesAccumulate = System.currentTimeMillis();
-                System.out.println("Accumulated results from files in " + (endTimeFilesAccumulate - endTimeFiles) + " ms");
-
-                scores.calculateKNeighbourhoodScores();
-                long endTimeFilesCompute = System.currentTimeMillis();
-                System.out.println("Computed all files in " + (endTimeFilesCompute - endTimeFilesAccumulate) + " ms");
+            ComputeNeighborhoodScores scores = new ComputeNeighborhoodScores("output_threaded.csv");
+            for (ProcessFilesTask task : tasks) {
+                scores.AddResults(task.processor.getCharacterOccurances(), task.processor.getkNeighborhoods());
             }
-        }
+
+            long endTimeFilesAccumulate = System.currentTimeMillis();
+            System.out.println("Accumulated results from files in " + (endTimeFilesAccumulate - endTimeFiles) + " ms");
+
+            scores.calculateKNeighbourhoodScores();
+            long endTimeFilesCompute = System.currentTimeMillis();
+            System.out.println("Computed all files in " + (endTimeFilesCompute - endTimeFilesAccumulate) + " ms");
+     }
     }
 }
