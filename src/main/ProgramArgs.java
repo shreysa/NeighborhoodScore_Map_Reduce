@@ -8,7 +8,7 @@ package src.main;
 
 
 public class ProgramArgs {
-    final String fileName;
+    final String filePath;
     final int kValue;
     final int numThreads;
 
@@ -47,7 +47,7 @@ ProgramArgs(String[] args) {
         }
     }
 
-    this.fileName = fileName;
+    this.filePath = fileName;
     this.kValue = kval;
     this.numThreads = nT;
 }
@@ -57,8 +57,8 @@ ProgramArgs(String[] args) {
      * Getter for file name
      * @return returns the fileName
      */
-    public String getFileName() {
-        return fileName;
+    public String getFilePath() {
+        return this.filePath;
     }
 
     /**

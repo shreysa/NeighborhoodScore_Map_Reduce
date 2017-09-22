@@ -12,7 +12,7 @@ import java.util.*;
 public class ProcessFiles {
     final int NUM_EXPECTED_CHARS;
     final int ASCII_START_INDEX_LETTERS;
-
+    public boolean isThreaded;
     private Integer[] characterOccurances;
 
     File[] files;
@@ -112,7 +112,6 @@ public class ProcessFiles {
 
         BufferedWriter bw = new BufferedWriter(new FileWriter("output.csv"));
 
-        System.out.println("HashMap after sorting by keys in ascending order ");
         for(Map.Entry<String, Float> mapping : mappings){
             bw.write(mapping.getKey() + "," + mapping.getValue() + "\n");
         }

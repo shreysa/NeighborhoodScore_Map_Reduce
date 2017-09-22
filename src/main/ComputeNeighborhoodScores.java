@@ -11,6 +11,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Computes the letter scores, neighborhood scores, accumulates these scores,
+ * kNeighborhood scores and kneighborhoodMean scores and sends it to an output_threaded.csv
+ * file
+ */
+
 public class ComputeNeighborhoodScores {
     public static final int NUM_EXPECTED_CHARS = 26;
     public static final int ASCII_START_INDEX_LETTERS = 97;
@@ -30,6 +36,11 @@ public class ComputeNeighborhoodScores {
         }
     }
 
+    /**
+     * This method computes the letter scores
+     *
+     * @return Returns an integer array that has scores for each alphabet
+     */
     public Integer[] computeLetterScores() {
         Integer[] letterScore = new Integer[NUM_EXPECTED_CHARS];
         for (int i = 0; i < NUM_EXPECTED_CHARS; i++) {
@@ -58,6 +69,11 @@ public class ComputeNeighborhoodScores {
         return letterScore;
     }
 
+    /**
+     * This method produces an output_threaded.csv file that has the kNeighborhoodMean
+     * scores
+     */
+
     public void writeSortedFinalWordScores() throws IOException {
         TreeMap<String, Float> sorted = new TreeMap<String, Float>(wordKNeighborhoodMeanScore);
         Set<Map.Entry<String, Float>> mappings = sorted.entrySet();
@@ -70,6 +86,12 @@ public class ComputeNeighborhoodScores {
 
         bw.close();
     }
+
+    /**
+     * This method accumulates the letter and kneighborhood scores from various files
+     *
+     * @param charOccurances array and neighborhoods hashmap
+     */
 
     void AddResults(Integer[] charOccurances, Map<String, List<List<String>>> neighborhoods ) {
 
@@ -93,6 +115,12 @@ public class ComputeNeighborhoodScores {
             }
         }
     }
+
+    /**
+     * This method computes KNeighborhoodMean score
+     *
+     * @param letterScore array
+     */
 
     public void computeKNeighborMeans(Integer[] letterScore) {
         HashMap<String, Integer> wordScoreCache = new HashMap<String, Integer>();
@@ -137,6 +165,21 @@ public class ComputeNeighborhoodScores {
         }
     }
 
+    /**
+     * This method calls all the other methods in this class in order to calculate the
+     * various scores
+     *
+     */
+    public void calculateKNeighbourhoodScores() throws IOException {
+        Integer[] letterScore = computeLetterScores();
+        computeKNeighborMeans(letterScore);
+        writeSortedFinalWordScores();
+    }
+
+
+    /* Debug methods
+     */
+
     public void printLetterStats(Integer[] letterScore) {
         System.out.println("Total number of characters: " + totalCharacters);
         String header = "";
@@ -154,20 +197,11 @@ public class ComputeNeighborhoodScores {
             score += "\t" + letterScore[i];
         }
 
-     //   System.out.println("Percentage Total: " + percentageTotal);
-       // System.out.println(header);
-        //System.out.println(occurances);
-        //System.out.println(percentage);
-        //System.out.println(score);
-    }
-
-    public void calculateKNeighbourhoodScores() throws IOException {
-        Integer[] letterScore = computeLetterScores();
-       // printLetterStats(letterScore);
-
-        computeKNeighborMeans(letterScore);
-
-       writeSortedFinalWordScores();
+         System.out.println("Percentage Total: " + percentageTotal);
+         System.out.println(header);
+         System.out.println(occurances);
+         System.out.println(percentage);
+         System.out.println(score);
     }
 
 }

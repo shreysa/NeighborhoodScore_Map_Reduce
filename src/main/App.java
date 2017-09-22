@@ -28,6 +28,7 @@ public class App {
      * @param fileName Name of the file to be processed
      * @return Returns List of Strings, each entry corresponds to a line in the file
      */
+
     public static List<String> readFile(String fileName) {
         File file = new File(fileName);
 
@@ -79,14 +80,7 @@ public class App {
     public static void main(String[] args) throws IOException {
         final boolean NO_LOAD_BALANCE = true;
         ProgramArgs options = new ProgramArgs(args);
-        String path = "";
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("--path")) {
-                path = args[i + 1];
-                break;
-            }
-        }
-        File[] files = getFilesInDirectory(path);
+        File[] files = getFilesInDirectory(options.getFilePath());
 
         //Sequential version
         if (options.getNumThreads() == 1) {
@@ -94,7 +88,6 @@ public class App {
             ProcessFilesSequential pr = new ProcessFilesSequential(options);
             pr.processFiles(files);
             long endTimeFiles = System.currentTimeMillis();
-
             //System.out.println(endTimeFiles - startTimeFiles + "ms");
         } else {
             //Without any load balance
@@ -104,7 +97,7 @@ public class App {
                 int segment = (files.length) / options.getNumThreads();
                 long startTimeFiles = System.currentTimeMillis();
 
-                //To get what files get assigned to which thread
+                //Assigns files to threads
                 for (int i = 0; i < options.getNumThreads(); i++) {
                     int startIndex = i * segment;
                     int endIndex = (i + 1) * segment;
@@ -121,6 +114,7 @@ public class App {
                     executor.execute(worker);
                     tasks.add(worker);
                 }
+
                 executor.shutdown();
                 try {
                     executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);

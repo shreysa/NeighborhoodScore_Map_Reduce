@@ -30,6 +30,8 @@ ifndef PATH
 PATH = ./input
 endif
 
+all: build serial parallel
+
 default: build run
 
 gzip: 
