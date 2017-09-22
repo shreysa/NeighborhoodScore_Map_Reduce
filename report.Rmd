@@ -1,8 +1,10 @@
 ---
-title : "Assignment A0-A1"
+title: "Assignment A0-A1"
 author: "Shreysa Sharma"
-date  : "9/20/2017"
-output: html_document
+date: "9/20/2017"
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ### Introduction
@@ -34,7 +36,7 @@ Memory                            | 16 GB
 
 
 
-#### Summary of the design of evaluated program
+### Summary of the design of evaluated program
 
 The current implementation has 2 variants, one is serial and the other is parallel/multithreaded.
 In the multithreaded variant, the application first assigns files to the threads, then the files are processed parallelly by the specified number of threads where it keeps track of letter ocurrances and inserts words along with it's k-neighborhoods into a hashmap, then all the data from these various hashmaps and letter ocurrances is accumulated into a global data structure, the letter scores, word scores, k-neighborhood scores and k-neighborhood mean scores are computed and sorted on a single thread and sent out to an output file. 
@@ -152,3 +154,7 @@ The current implementation of this problem assigns complete dataset to the speci
 The program also has a section that implements a trivial load balance strategy where we find out the total size of the dataset and depending on the number of threads we allocate a certain size of work to each thread. 
 
 Looking at table 1 and 2, it is clear that the multithreaded variant with threads 11 and k value 2 has the best combination of performance and stability.(Answer to point 4 in assignment)
+
+### Conclusion
+
+During the completion of this assignment, it has become clear that implementation of a threaded program requires deeper understanding of threads, paarllel programming algorithms, synchronization methods, load balancing, the programming language itself, the memory and I/O bandwidths and so on. Depending upon the problem, different approaches can be considered that suit the problem in question. This increases the complexity and maintainability of the code making it difficult to deploy widely. The benefit of a framework which abstracts away these underlying parameters and provides the developer with a simpler API to deal with is obvious. As we can observe over the last few years HADOOP, SPARK etc. have taken over the industry and made it easier for developers to solve ever more difficult problems on very large datasets without worrying about most of the above complexities.
