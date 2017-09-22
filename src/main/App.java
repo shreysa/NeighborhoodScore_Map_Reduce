@@ -52,7 +52,7 @@ public class App {
     }
 
     /**
-     * This method gets all the files from the folder path with extension .txt
+     * This method gets all the files from the folder path with extension .txt.utf-8
      *
      * @param folderPath folder path from which files need to be processed
      * @return Returns Array of files, each entry corresponds to a file
@@ -62,30 +62,49 @@ public class App {
         File[] files = dir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                return name.endsWith(".txt");
+                return name.endsWith(".txt.utf-8");
             }
         });
         return files;
     }
 
+    /**
+     * Entry point of program, runs sequential or parallel program with or without load balance
+     * depending on the arguments passed.
+     *
+     * @param String [] args having path, k value and number of threads
+     * @return void
+     */
+
     public static void main(String[] args) throws IOException {
         final boolean NO_LOAD_BALANCE = true;
         ProgramArgs options = new ProgramArgs(args);
+        String path = "";
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("--path")) {
+                path = args[i + 1];
+                break;
+            }
+        }
+        File[] files = getFilesInDirectory(path);
 
-        File[] files = getFilesInDirectory("./data/books");
-
+        //Sequential version
         if (options.getNumThreads() == 1) {
+            long startTimeFiles = System.currentTimeMillis();
             ProcessFilesSequential pr = new ProcessFilesSequential(options);
             pr.processFiles(files);
+            long endTimeFiles = System.currentTimeMillis();
+
+            //System.out.println(endTimeFiles - startTimeFiles + "ms");
         } else {
+            //Without any load balance
             if (NO_LOAD_BALANCE) {
-                System.out.println("Processing data set on " + options.getNumThreads() + " threads.");
                 ExecutorService executor = Executors.newFixedThreadPool(options.getNumThreads());
                 List<ProcessFilesTask> tasks = new ArrayList<ProcessFilesTask>();
                 int segment = (files.length) / options.getNumThreads();
-                System.out.println("files length" + files.length);
-                System.out.println("Number of files per thread " + segment);
                 long startTimeFiles = System.currentTimeMillis();
+
+                //To get what files get assigned to which thread
                 for (int i = 0; i < options.getNumThreads(); i++) {
                     int startIndex = i * segment;
                     int endIndex = (i + 1) * segment;
@@ -95,13 +114,9 @@ public class App {
                             (endIndex < files.length)) {
                         endIndex = files.length;
                     }
-                    System.out.println("Thread " + i + " start: " + startIndex + " endIndex: " + endIndex);
 
                     File[] filesForThread = Arrays.copyOfRange(files, startIndex, endIndex);
-                    System.out.println("number of file to  be processed by thread" + i + " is " + filesForThread.length);
-                    for (File file : filesForThread) {
-                        System.out.println(file.getName() + " thread " + i);
-                    }
+
                     ProcessFilesTask worker = new ProcessFilesTask(filesForThread, options.getkValue());
                     executor.execute(worker);
                     tasks.add(worker);
@@ -109,36 +124,41 @@ public class App {
                 executor.shutdown();
                 try {
                     executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ex) {
+                    System.err.println("ERROR: " + ex.getMessage());
                 }
 
                 long endTimeFiles = System.currentTimeMillis();
-                System.out.println("Processed all files in " + (endTimeFiles - startTimeFiles) + "ms");
+                System.out.println("Processed all files in " + (endTimeFiles - startTimeFiles) + " ms");
 
                 ComputeNeighborhoodScores scores = new ComputeNeighborhoodScores();
                 for (ProcessFilesTask task : tasks) {
                     scores.AddResults(task.processor.getCharacterOccurances(), task.processor.getkNeighborhoods());
                 }
+
+                long endTimeFilesAccumulate = System.currentTimeMillis();
+                System.out.println("Accumulated results from files in " + (endTimeFilesAccumulate - endTimeFiles) + " ms");
+
                 scores.calculateKNeighbourhoodScores();
+
+                long endTimeFilesCompute = System.currentTimeMillis();
+                System.out.println("Computed all files in " + (endTimeFilesCompute - endTimeFilesAccumulate) + " ms");
             } else {
-                // With load balance
+                // With load balance : takes the size of files and then distributes the work
+                // amongst threads
                 long totalLoad = 0;
                 for (File f : files) {
                     totalLoad += f.length();
                 }
 
-                System.out.println("Total \'load\' in files: " + totalLoad);
-
-                System.out.println("Processing data set on " + options.getNumThreads() + " threads.");
                 ExecutorService executor = Executors.newFixedThreadPool(options.getNumThreads());
                 List<ProcessFilesTask> tasks = new ArrayList<ProcessFilesTask>();
 
                 long workPerThread = (totalLoad) / options.getNumThreads();
-                System.out.println("Work per thread " + workPerThread);
                 long startTimeFiles = System.currentTimeMillis();
                 int currentFile = 0;
                 for (int i = 0; i < options.getNumThreads(); i++) {
-                    int startIndex = currentFile + 1;
+                    int startIndex = currentFile;
                     long currentWorkForThread = 0;
                     for (; currentFile < files.length; currentFile++) {
                         currentWorkForThread += files[currentFile].length();
@@ -150,7 +170,7 @@ public class App {
                     if (endIndex > files.length || i == options.getNumThreads() - 1) {
                         endIndex = files.length;
                     }
-                    System.out.println("Thread " + i + " start: " + startIndex + " endIndex: " + endIndex + " work: " + currentWorkForThread);
+
                     File[] filesForThread = Arrays.copyOfRange(files, startIndex, endIndex);
                     ProcessFilesTask worker = new ProcessFilesTask(filesForThread, options.getkValue());
                     executor.execute(worker);
@@ -159,17 +179,24 @@ public class App {
                 executor.shutdown();
                 try {
                     executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ex) {
+                    System.err.println("ERROR: " + ex.getMessage());
                 }
 
                 long endTimeFiles = System.currentTimeMillis();
-                System.out.println("Processed all files in " + (endTimeFiles - startTimeFiles) + "ms");
+                System.out.println("Processed all files in " + (endTimeFiles - startTimeFiles) + " ms");
 
                 ComputeNeighborhoodScores scores = new ComputeNeighborhoodScores();
                 for (ProcessFilesTask task : tasks) {
                     scores.AddResults(task.processor.getCharacterOccurances(), task.processor.getkNeighborhoods());
                 }
+
+                long endTimeFilesAccumulate = System.currentTimeMillis();
+                System.out.println("Accumulated results from files in " + (endTimeFilesAccumulate - endTimeFiles) + " ms");
+
                 scores.calculateKNeighbourhoodScores();
+                long endTimeFilesCompute = System.currentTimeMillis();
+                System.out.println("Computed all files in " + (endTimeFilesCompute - endTimeFilesAccumulate) + " ms");
             }
         }
     }

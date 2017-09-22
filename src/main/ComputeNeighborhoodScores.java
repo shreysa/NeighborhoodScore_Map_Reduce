@@ -64,7 +64,6 @@ public class ComputeNeighborhoodScores {
 
         BufferedWriter bw = new BufferedWriter(new FileWriter("output_threaded.csv"));
 
-        System.out.println("HashMap after sorting by keys in ascending order ");
         for(Map.Entry<String, Float> mapping : mappings){
             bw.write(mapping.getKey() + "," + mapping.getValue() + "\n");
         }
@@ -155,21 +154,20 @@ public class ComputeNeighborhoodScores {
             score += "\t" + letterScore[i];
         }
 
-        System.out.println("Percentage Total: " + percentageTotal);
-        System.out.println(header);
-        System.out.println(occurances);
-        System.out.println(percentage);
-        System.out.println(score);
+     //   System.out.println("Percentage Total: " + percentageTotal);
+       // System.out.println(header);
+        //System.out.println(occurances);
+        //System.out.println(percentage);
+        //System.out.println(score);
     }
 
     public void calculateKNeighbourhoodScores() throws IOException {
         Integer[] letterScore = computeLetterScores();
-
-        printLetterStats(letterScore);
+       // printLetterStats(letterScore);
 
         computeKNeighborMeans(letterScore);
 
-        writeSortedFinalWordScores();
+       writeSortedFinalWordScores();
     }
 
 }

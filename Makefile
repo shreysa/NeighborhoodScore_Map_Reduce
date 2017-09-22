@@ -27,10 +27,16 @@ endif
 
 # If no PATH option is provided, use ./data/books by default
 ifndef PATH
-PATH = ./data/books
+PATH = ./input
 endif
 
 default: build run
+
+gzip: 
+	gzip -q ./input/* 
+
+gunzip:
+	gunzip -q ./input/*
 
 build:  App.class                    \
        	ProcessFilesSequential.class \
@@ -39,14 +45,13 @@ build:  App.class                    \
        	ProcessFiles.class           \
        	ComputeNeighborhoodScores.class
 
-
 run: serial
 
 serial: 
 	$(JVM) -cp . src.main.App --path $(PATH) --k $(KVALUE) --threads 1
 
-parallel:
-	$(JVM) -cp . src/main/App --path $(PATH) --k $(KVALUE) --threads $(THREADS)
+parallel: 
+	$(JVM) -cp . src.main.App --path $(PATH) --k $(KVALUE) --threads $(THREADS)
 
 App.class:  src/main/App.java
 	$(JCC) $(JFLAGS) ./src/main/App.java

@@ -74,7 +74,9 @@ public class ProcessFilesSequential {
 
         long endTimeFiles = System.currentTimeMillis();
 
-        System.out.println("Processed all files in " + (endTimeFiles - startTimeFiles) + "ms");
+        System.out.println("Processed all files in " + (endTimeFiles - startTimeFiles) + " ms");
+
+        System.out.println("accumulate " + (endTimeFiles - endTimeFiles) + " ms");
 
         long startTimeScores = System.currentTimeMillis();
         Integer[] letterScore = computeLetterScores();
@@ -82,10 +84,10 @@ public class ProcessFilesSequential {
         computeKNeighborMeans(letterScore);
         long endTimeScores = System.currentTimeMillis();
 
-        System.out.println("Computed word and neighbor scores in " + (endTimeScores - startTimeScores) + "ms");
+        System.out.println("Computed word and neighbor scores in " + (endTimeScores - startTimeScores) + " ms");
 
         writeSortedFinalWordScores();
-        printLetterStats(letterScore);
+       // printLetterStats(letterScore);
     }
 
     public void processWords(List<String> words) {
@@ -210,8 +212,6 @@ public class ProcessFilesSequential {
         Set<Map.Entry<String, Float>> mappings = sorted.entrySet();
 
         BufferedWriter bw = new BufferedWriter(new FileWriter("output.csv"));
-
-        System.out.println("Saving neighborhood scores after sorting by keys to output.csv");
         for(Map.Entry<String, Float> mapping : mappings){
             bw.write(mapping.getKey() + "," + mapping.getValue() + "\n");
         }
@@ -220,7 +220,6 @@ public class ProcessFilesSequential {
     }
 
     public void printLetterStats(Integer[] letterScore) {
-        System.out.println("Total number of characters: " + totalCharacters);
         String header = "";
         String occurances = "";
         String percentage = "";
@@ -236,11 +235,11 @@ public class ProcessFilesSequential {
             score += "\t" + letterScore[i];
         }
 
-        System.out.println("Percentage Total: " + percentageTotal);
-        System.out.println(header);
-        System.out.println(occurances);
-        System.out.println(percentage);
-        System.out.println(score);
+       // System.out.println("Percentage Total: " + percentageTotal);
+        //System.out.println(header);
+        //System.out.println(occurances);
+        //System.out.println(percentage);
+        //System.out.println(score);
     }
 
 }

@@ -1,0 +1,117 @@
+---
+title : "Assignment A0-A1"
+author: "Shreysa Sharma"
+date  : "9/20/2017"
+output: html_document
+---
+
+
+### Specifications of Execution Environment
+Attribute                         | Value
+----------------------------------|-------------------------------
+Java Version                      | 1.8.0_102
+Java(TM) SE Runtime Environment   | (build 1.8.0_102-b14)
+Java HotSpot(TM) 64-Bit Server VM | (build 25.102-b14, mixed mode)
+Model Identifier                  |	MacBookPro11,2
+Processor Name                    |	Intel Core i7
+Processor Speed                   |	2.2 GHz
+Number of Processors              |	1
+Total Number of Cores             |	4
+L2 Cache (per Core)               |	256 KB
+L3 Cache                          |	6 MB
+Memory                            | 16 GB
+
+### Summary of the design of evaluated program
+
+The current implementation has 2 variants, one is serial and the other is parallel/multithreaded.
+In the multithreaded variant, the application first assigns files to the threads, then the files are processed parallelly by the specified number of threads where it keeps track of letter ocurrances and inserts words along with it's k-neighborhoods into a hashmap, then all the data from these various hashmaps and letter ocurrances is accumulated into a global data structure, the letter scores, word scores, k-neighborhood scores and k-neighborhood mean scores are computed and sorted on a single thread and sent out to an output file. 
+
+As the K value increases both the serial and parallel computation would increase but serial part of computation would increase at greater extent. 
+
+As per Amdahl's law, the theoretical speedup in latency of the execution of a program in function of the number of processors executing it, for different number of threads/processors. The speedup is limited by the serial part of the program. For example, if 95% of the program can be parallelized, the theoretical maximum speedup using parallel computing would be 20 times, likewise if 50% of the program can be parallelized - the therotical maximum speedup using parallel computing would be 2 times the time taken by serial version. 
+(Above statement taken from https://en.wikipedia.org/wiki/Amdahl%27s_law)
+
+### Collected results from performance evaluations
+##### Table 1: K = 2, Threads = 1-16 (timings averaged across 3 runs per variant)
+
+```{r}
+library(ggplot2)
+performance_data_k2<-read.csv("output/results_kval_2_speed_up.csv")
+knitr::kable(performance_data_k2)
+```
+
+```{r}
+ggplot(performance_data_k2, aes(x=num_threads, y=processing_speed_up, color="processing")) + 
+  geom_line() + geom_point() +
+  ylab("Speed Up (compared to threads=1)") + 
+  xlab("Number of threads") + 
+  scale_y_continuous(breaks=seq(0,16,2), limits = c(0,16)) + 
+  scale_x_continuous(breaks=seq(0,16,2), limits = c(0,16)) +
+  geom_line(aes(x=num_threads, y=num_threads, colour="ideal")) +
+  geom_point(aes(x=num_threads, y=num_threads, colour="ideal")) +
+  geom_line(aes(x=num_threads, y=compute_speed_up, colour="compute")) +
+  geom_point(aes(x=num_threads, y=compute_speed_up, colour="compute")) +
+  geom_line(aes(x=num_threads, y=total_speed_up, colour="total")) +
+  geom_point(aes(x=num_threads, y=total_speed_up, colour="total")) +
+  labs(title="Plot 1: Speed-up - Ideal vs Real (k = 2)")
+
+ggplot(performance_data_k2, aes(x=num_threads, y=processing_speed_up, color="processing")) + 
+  geom_line() + geom_point() +
+  ylab("Speed Up (compared to threads=1)") + 
+  xlab("Number of threads") + 
+  scale_y_continuous(breaks=seq(0,3,0.25)) + 
+  scale_x_continuous(breaks=seq(0,16,1), limits = c(0,16)) +
+  geom_line(aes(x=num_threads, y=compute_speed_up, colour="compute")) +
+  geom_point(aes(x=num_threads, y=compute_speed_up, colour="compute")) +
+  geom_line(aes(x=num_threads, y=total_speed_up, colour="total")) +
+  geom_point(aes(x=num_threads, y=total_speed_up, colour="total")) +
+  labs(title="Plot 2: Speed-up vs Num Threads (k = 2)")
+```
+
+##### Table 2: K = 4, Threads = 1-16 (timings averaged across 3 runs per variant)
+
+```{r}
+library(ggplot2)
+performance_data_k4<-read.csv("output/results_kval_4_speed_up.csv")
+knitr::kable(performance_data_k4)
+ggplot(performance_data_k4, aes(x=num_threads, y=processing_speed_up, color="processing")) + 
+  geom_line() + geom_point() +
+  ylab("Speed Up (compared to threads=1)") + 
+  xlab("Number of threads") + 
+  scale_y_continuous(breaks=seq(0,16,2), limits = c(0,16)) + 
+  scale_x_continuous(breaks=seq(0,16,2), limits = c(0,16)) +
+  geom_line(aes(x=num_threads, y=num_threads, colour="ideal")) + 
+  geom_point(aes(x=num_threads, y=num_threads, colour="ideal")) + 
+  geom_line(aes(x=num_threads, y=compute_speed_up, colour="compute")) +
+  geom_point(aes(x=num_threads, y=compute_speed_up, colour="compute")) +
+  geom_line(aes(x=num_threads, y=total_speed_up, colour="total")) +
+  geom_point(aes(x=num_threads, y=total_speed_up, colour="total")) +
+  labs(title="Plot 3: Speed-up - Ideal vs Real (k = 4)")
+
+ggplot(performance_data_k4, aes(x=num_threads, y=processing_speed_up, color="processing")) + 
+  geom_line() + geom_point() +
+  ylab("Speed Up (compared to threads=1)") + 
+  xlab("Number of threads") + 
+  scale_y_continuous(breaks=seq(0,3,0.25)) + 
+  scale_x_continuous(breaks=seq(0,16,1), limits = c(0,16)) +
+  geom_line(aes(x=num_threads, y=compute_speed_up, colour="compute")) +
+  geom_point(aes(x=num_threads, y=compute_speed_up, colour="compute"), shape=15) +
+  geom_line(aes(x=num_threads, y=total_speed_up, colour="total")) +
+  geom_point(aes(x=num_threads, y=total_speed_up, colour="total"), shape=17) +
+  labs(title="Plot 4: Speed-up vs Num Threads (k = 4)")
+```
+
+``` {r}
+performance_data_k2<-read.csv("output/results_kval_2_speed_up.csv")
+performance_data_k4<-read.csv("output/results_kval_4_speed_up.csv")
+ggplot() + 
+  geom_line(data=performance_data_k4, aes(x=num_threads, y=processing_avg_s, color="processing_k4")) +
+  geom_point(color="red") +
+  geom_line(data=performance_data_k4, aes(x=num_threads, y=compute_avg_s, color="compute_k4")) +
+  ylab("Time taken in seconds") + 
+  xlab("Number of threads") + 
+  scale_x_continuous(breaks=seq(1,16,1), limits = c(1,16)) +
+  geom_line(data=performance_data_k2, aes(x=num_threads, y=processing_avg_s, colour="processing_k2")) + 
+  geom_line(data=performance_data_k2, aes(x=num_threads, y=compute_avg_s, colour="compute_k2")) + 
+  labs(title="Comparison between k = 2 & k = 4 runs")
+```

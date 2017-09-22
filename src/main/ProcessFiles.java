@@ -124,8 +124,7 @@ public class ProcessFiles {
         TreeMap<String, Float> sorted = new TreeMap<String, Float>(wordKNeighborhoodMeanScore);
         Set<Map.Entry<String, Float>> mappings = sorted.entrySet();
 
-        System.out.println("HashMap after sorting by keys in ascending order ");
-        for(Map.Entry<String, Float> mapping : mappings){
+       for(Map.Entry<String, Float> mapping : mappings){
             System.out.println(mapping.getKey() + ": " + mapping.getValue());
         }
     }
@@ -220,7 +219,7 @@ public class ProcessFiles {
     public void calculateKNeighbourhoodScores() throws IOException {
         Integer[] letterScore = computeLetterScores();
 
-        printLetterStats(letterScore);
+       printLetterStats(letterScore);
 
         computeKNeighborMeans(letterScore);
 
