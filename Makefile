@@ -30,8 +30,6 @@ ifndef PATH
 PATH = ./input
 endif
 
-all: build serial parallel
-
 default: build run
 
 gzip: 
@@ -46,7 +44,14 @@ build:  App.class                    \
        	ProcessFiles.class           \
        	ComputeNeighborhoodScores.class
 
-run: serial
+run:
+	python ./src/run.py report
+
+report:
+	Rscript -e 'library(rmarkdown); rmarkdown::render("./report.Rmd", "html_document")'
+
+
+all: build run
 
 serial: 
 	$(JVM) -cp . src.main.App --path $(PATH) --k $(KVALUE) --threads 1

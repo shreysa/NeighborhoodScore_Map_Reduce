@@ -18,10 +18,19 @@
 ### Instructions for building and running the program
 
 1. Unzip the input files by running `make gunzip`.
-2. Build the project by running `make build`.
+2. Build the project by running `make all`.
 3. Serial run: To run the sequential version of the program `eg. make serial PATH=./input KVALUE=4`.
 4. Parallel run: To run the threaded version of the program `eg. make parallel PATH=./input KVALUE=4 THREADS=4`
 5. The output of the serial run is stored in `output.csv` in the project folder. 
 6. The output of the parallel run is stored in `output_threaded.csv` in the project folder.
 7. `make clean` removes all the `*.class` files, useful for a clean build. 
 
+### System requirements
+1. Java 1.8
+2. Python 2.7 +
+3. R
+4. make
+5. pandoc
+6. RMarkdown
+7. ggplot
+ 
