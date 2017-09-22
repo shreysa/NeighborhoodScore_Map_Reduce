@@ -45,8 +45,8 @@ for kval in KVALUES:
     f.write("num_threads,processing_avg_s,accumulate_avg_s,compute_avg_s,total_avg_s,processing_speed_up,compute_speed_up,total_speed_up\n")
     serialRun = results[0]
     for result in results:
-        processing_speedup_s = serialRun[1]/result[1]
-        compute_speedup_s = serialRun[2]/result[2]
-        total_speedup_s = serialRun[4]/result[4]
+        processing_speed_up = serialRun[1]/result[1]
+        compute_speed_up = serialRun[2]/result[2]
+        total_speed_up = serialRun[4]/result[4]
         f.write("{},{},{},{},{},{},{},{}\n".format(result[0],result[1],
-        result[2],result[3],result[4],processing_speedup_s, compute_speedup_s, total_speedup_s))
+        result[2],result[3],result[4],processing_speed_up, compute_speed_up, total_speed_up))
