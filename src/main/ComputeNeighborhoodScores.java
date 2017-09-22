@@ -25,9 +25,11 @@ public class ComputeNeighborhoodScores {
     private HashMap<String, Float> wordKNeighborhoodMeanScore;
     private Integer[] characterOccurances;
     private long totalCharacters;
+    String outputFileName;
 
-    ComputeNeighborhoodScores() {
+    ComputeNeighborhoodScores(String outputFileName) {
         totalCharacters = 0;
+        this.outputFileName = outputFileName;
         kNeighborhoods = new HashMap<String, List<List<String>>>();
         wordKNeighborhoodMeanScore = new HashMap<String, Float>();
         characterOccurances = new Integer[NUM_EXPECTED_CHARS];
@@ -70,7 +72,7 @@ public class ComputeNeighborhoodScores {
     }
 
     /**
-     * This method produces an output_threaded.csv file that has the kNeighborhoodMean
+     * This method produces an output csv file that has the kNeighborhoodMean
      * scores
      */
 
@@ -78,7 +80,7 @@ public class ComputeNeighborhoodScores {
         TreeMap<String, Float> sorted = new TreeMap<String, Float>(wordKNeighborhoodMeanScore);
         Set<Map.Entry<String, Float>> mappings = sorted.entrySet();
 
-        BufferedWriter bw = new BufferedWriter(new FileWriter("output_threaded.csv"));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(outputFileName));
 
         for(Map.Entry<String, Float> mapping : mappings){
             bw.write(mapping.getKey() + "," + mapping.getValue() + "\n");

@@ -10,8 +10,8 @@ import java.io.*;
 import java.util.*;
 
 public class ProcessFiles {
-    final int NUM_EXPECTED_CHARS;
-    final int ASCII_START_INDEX_LETTERS;
+    static final int NUM_EXPECTED_CHARS = 26;
+    static final int ASCII_START_INDEX_LETTERS = 97;
     public boolean isThreaded;
     private Integer[] characterOccurances;
 
@@ -26,8 +26,6 @@ public class ProcessFiles {
         this.kval = kval;
         kNeighborhoods = new HashMap<String, List<List<String>>>();
         wordKNeighborhoodMeanScore = new HashMap<String, Float>();
-        NUM_EXPECTED_CHARS = 26;
-        ASCII_START_INDEX_LETTERS = 97;
         characterOccurances = new Integer[NUM_EXPECTED_CHARS];
         for (int i = 0; i < NUM_EXPECTED_CHARS; i++) {
             characterOccurances[i] = 0;
@@ -191,7 +189,7 @@ public class ProcessFiles {
                 }
             }
 
-            // Add to has map
+            // Add to hash map
             if (kNeighborhoods.containsKey(word)) {
                 List<List<String>> value = kNeighborhoods.get(word);
                 value.add(kNeighbors);
@@ -207,7 +205,6 @@ public class ProcessFiles {
             for (char c : word.toCharArray()) {
                 int asciiValue = (int) c;
                 int index = (asciiValue - ASCII_START_INDEX_LETTERS);
-                //System.out.println("char: " + c + " asciiValue: " + c + " index: " + index);
                 characterOccurances[index] += 1;
             }
         }
@@ -239,9 +236,8 @@ public class ProcessFiles {
         return kNeighborhoods;
     }
 
-    public void processFile() throws IOException {
+    public void processFiles() throws IOException {
         for (File f: files) {
-            //  System.out.println("Reading file: " + f.getName());
 
             if (!f.exists() || !f.canRead()) {
                 System.err.format("Unable to read file %s. Check path and permissions.\n", f.getName());

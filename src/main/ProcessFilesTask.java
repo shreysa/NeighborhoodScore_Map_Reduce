@@ -20,7 +20,7 @@ public class ProcessFilesTask implements  Runnable {
     @Override
     public void run() {
         try {
-            this.processor.processFile();
+            this.processor.processFiles();
         } catch (IOException ex) {
             System.err.println("IO exception: " + ex.getMessage());
             System.exit(-1);
