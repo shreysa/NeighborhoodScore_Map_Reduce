@@ -3,11 +3,16 @@
 ### Shreysa Sharma 
 
 ### Directory Structure 
-`input` - Contains the input files used for the runs (taken from assignment task page)
-`output` - Contains csv files with the averaged timings and speed up information. These files are used in the generation of reports. 
+`input` - Contains the input files used for the runs (taken from assignment task page).
+
+`output` - Contains csv files with the averaged timings and speed up information. These files are used in the generation of reports.
+
 `src` - Contains all the source files associated with the implementation. 
-`Makefile` - Makefile to assist in building, running and managing the project
-`report.Rmd` - Report file in R-Markdown format. 
+
+`Makefile` - Makefile to assist in building, running and managing the project.
+
+`report.Rmd` - Report file in R-Markdown format.
+
 `report.html` - HTML rendering of the above report.
 
 ### Instructions for building and running the program
