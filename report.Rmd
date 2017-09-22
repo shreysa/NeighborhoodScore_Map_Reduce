@@ -26,11 +26,6 @@ Memory                            | 16 GB
 The current implementation has 2 variants, one is serial and the other is parallel/multithreaded.
 In the multithreaded variant, the application first assigns files to the threads, then the files are processed parallelly by the specified number of threads where it keeps track of letter ocurrances and inserts words along with it's k-neighborhoods into a hashmap, then all the data from these various hashmaps and letter ocurrances is accumulated into a global data structure, the letter scores, word scores, k-neighborhood scores and k-neighborhood mean scores are computed and sorted on a single thread and sent out to an output file. 
 
-As the K value increases both the serial and parallel computation would increase but serial part of computation would increase at greater extent. 
-
-As per Amdahl's law, the theoretical speedup in latency of the execution of a program in function of the number of processors executing it, for different number of threads/processors. The speedup is limited by the serial part of the program. For example, if 95% of the program can be parallelized, the theoretical maximum speedup using parallel computing would be 20 times, likewise if 50% of the program can be parallelized - the therotical maximum speedup using parallel computing would be 2 times the time taken by serial version. 
-(Above statement taken from https://en.wikipedia.org/wiki/Amdahl%27s_law)
-
 ### Collected results from performance evaluations
 ##### Table 1: K = 2, Threads = 1-16 (timings averaged across 3 runs per variant)
 
@@ -39,6 +34,9 @@ library(ggplot2)
 performance_data_k2<-read.csv("output/results_kval_2_speed_up.csv")
 knitr::kable(performance_data_k2)
 ```
+
+The above table contains data collected by running the program 3 times with threads range (1, 16) and K value as 2. As mentioned above in the summary of design, the program processes the files on different number of threads, then the data is accumulated and then computation of      various scores is done. The columns processing_avg_s, accumulate_avg_s and compute_avg_s
+respectively represent this data. The total_avg_s is nothing but sum of data in all 3           columns. According to Amdahl's law the speed up of a program for the same work (i.e the same problem with same input) is the time taken by the program when it is run sequentially divided by time taken by the program when it is run parallelly. Therefore, the columns processing_speed_up, accumulate_speed_up and compute_speed_up represent the speed up of the various parts of the program.
 
 ```{r}
 ggplot(performance_data_k2, aes(x=num_threads, y=processing_speed_up, color="processing")) + 
@@ -54,10 +52,20 @@ ggplot(performance_data_k2, aes(x=num_threads, y=processing_speed_up, color="pro
   geom_line(aes(x=num_threads, y=total_speed_up, colour="total")) +
   geom_point(aes(x=num_threads, y=total_speed_up, colour="total")) +
   labs(title="Plot 1: Speed-up - Ideal vs Real (k = 2)")
+```
 
+Plot 1 provides a graphical representation of data shown in table 1. The light green curve which is at a 45 degree angle to x axis shows how the speed up should be as the number of threads increase ideally. the other 3 curves represent the processing speed up, compute speed up and total speed up. 
+
+As per Amdahl's law, the theoretical speedup in latency of the execution of a program in function of the number of processors executing it, for different number of threads/processors. The speedup is limited by the serial part of the program. For example, if 95% of the program can be parallelized, the theoretical maximum speedup using parallel computing would be 20 times, likewise if 50% of the program can be parallelized - the therotical maximum speedup using parallel computing would be 2 times the time taken by serial version. Plot 2 thereby signifies the same speed up representations. (Answer to point 2 in assignment)
+(Above statement taken from https://en.wikipedia.org/wiki/Amdahl%27s_law)
+
+Looking at plot 1 it is clear that the time taken by the threaded version of the program in the current implementation, if not at a great scale but is definitely less than the time taken by the sequential program.(Answer to point 1 in the assignment)
+
+
+```{r}
 ggplot(performance_data_k2, aes(x=num_threads, y=processing_speed_up, color="processing")) + 
   geom_line() + geom_point() +
-  ylab("Speed Up (compared to threads=1)") + 
+  ylab("Speed Up (compared to threads)") + 
   xlab("Number of threads") + 
   scale_y_continuous(breaks=seq(0,3,0.25)) + 
   scale_x_continuous(breaks=seq(0,16,1), limits = c(0,16)) +
@@ -68,6 +76,8 @@ ggplot(performance_data_k2, aes(x=num_threads, y=processing_speed_up, color="pro
   labs(title="Plot 2: Speed-up vs Num Threads (k = 2)")
 ```
 
+Plot 2 represents the processing speed up, compute speed up and compute speed up plotted against number of threads when K value is 2. It is clear that addition of more threads will give reduced performance as JVM will schedule multiple threads to the same physical core so for best performance threads should be equal to number of cores. (Answer to point 3 in assignment)
+
 ##### Table 2: K = 4, Threads = 1-16 (timings averaged across 3 runs per variant)
 
 ```{r}
@@ -76,7 +86,7 @@ performance_data_k4<-read.csv("output/results_kval_4_speed_up.csv")
 knitr::kable(performance_data_k4)
 ggplot(performance_data_k4, aes(x=num_threads, y=processing_speed_up, color="processing")) + 
   geom_line() + geom_point() +
-  ylab("Speed Up (compared to threads=1)") + 
+  ylab("Speed Up (compared to threads)") + 
   xlab("Number of threads") + 
   scale_y_continuous(breaks=seq(0,16,2), limits = c(0,16)) + 
   scale_x_continuous(breaks=seq(0,16,2), limits = c(0,16)) +
@@ -87,10 +97,14 @@ ggplot(performance_data_k4, aes(x=num_threads, y=processing_speed_up, color="pro
   geom_line(aes(x=num_threads, y=total_speed_up, colour="total")) +
   geom_point(aes(x=num_threads, y=total_speed_up, colour="total")) +
   labs(title="Plot 3: Speed-up - Ideal vs Real (k = 4)")
+```
 
+The above table contains data collected by running the program 3 times with threads range (1, 16) and K value as 4.
+
+```{r}
 ggplot(performance_data_k4, aes(x=num_threads, y=processing_speed_up, color="processing")) + 
   geom_line() + geom_point() +
-  ylab("Speed Up (compared to threads=1)") + 
+  ylab("Speed Up (compared to threads)") + 
   xlab("Number of threads") + 
   scale_y_continuous(breaks=seq(0,3,0.25)) + 
   scale_x_continuous(breaks=seq(0,16,1), limits = c(0,16)) +
@@ -100,6 +114,8 @@ ggplot(performance_data_k4, aes(x=num_threads, y=processing_speed_up, color="pro
   geom_point(aes(x=num_threads, y=total_speed_up, colour="total"), shape=17) +
   labs(title="Plot 4: Speed-up vs Num Threads (k = 4)")
 ```
+
+Plot 4 represents the processing speed up, compute speed up and compute speed up plotted against number of threads when K value is 4. since each thread is reading file from hard disk we have multiple threads reading at the same time because of which the performance could also degrade as disk I/O bandwidth could be full. it is unlikely in this case as the total size of the dataset is of the order 71 mb and current internal drive/SSDbandwidth is greater than that but for large datasets it could cause a problem.
 
 ``` {r}
 performance_data_k2<-read.csv("output/results_kval_2_speed_up.csv")
@@ -113,5 +129,13 @@ ggplot() +
   scale_x_continuous(breaks=seq(1,16,1), limits = c(1,16)) +
   geom_line(data=performance_data_k2, aes(x=num_threads, y=processing_avg_s, colour="processing_k2")) + 
   geom_line(data=performance_data_k2, aes(x=num_threads, y=compute_avg_s, colour="compute_k2")) + 
-  labs(title="Comparison between k = 2 & k = 4 runs")
+  labs(title="Plot 5: Comparison between k = 2 & k = 4 runs")
 ```
+
+Plot 5 represents the processing time (dark green for k =2 and purple for k=4) and compute time (orange for k=2 and light green for k=4) for threads 1 to 16. This clearly signifies that as the K value increases, in the current implementation, the time taken by sequential and threaded program would increase but the serial part of the program would increase by a greater extent. 
+
+The current implementation of this problem assigns complete dataset to the specified number of threads, hence, the results of the dataset are retained in the memory in 1 go. Since, we have just 100 files this program runs fine but when we have million files it'll take up memory then we need to process the data in batches. Batch size is limited by the available memory.
+
+The program also has a section that implements a trivial load balance strategy where we find out the total size of the dataset and depending on the number of threads we allocate a certain size of work to each thread. 
+
+Looking at table 1 and 2, it is clear that the multithreaded variant with threads 11 and k value 2 has the best combination of performance and stability.(Answer to point 4 in assignment)
